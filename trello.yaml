@@ -1,11 +1,10 @@
 openapi: 3.1.0
 info:
   title: Trello Proxy API
-  description: Прокси API для полного доступа к Trello через Railway. GPT может управлять досками, списками, карточками, участниками и комментариями.
+  description: Прокси API для доступа к Trello. GPT может управлять досками, карточками, списками, участниками и комментариями.
   version: 1.0.0
 servers:
   - url: https://mindexecutor-production.up.railway.app
-    description: Railway backend proxy
 paths:
   /boards:
     get:
@@ -13,7 +12,7 @@ paths:
       summary: Получить все доски пользователя
       responses:
         '200':
-          description: Список досок Trello
+          description: Список досок
           content:
             application/json:
               schema:
@@ -61,10 +60,36 @@ paths:
                 items:
                   type: object
                   properties: {}
+  /cards:
+    post:
+      operationId: createCard
+      summary: Создать карточку
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, idList]
+              properties:
+                name:
+                  type: string
+                desc:
+                  type: string
+                idList:
+                  type: string
+      responses:
+        '200':
+          description: Карточка создана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
   /cards/{cardId}:
     put:
       operationId: updateCard
-      summary: Обновить карточку (название, описание и др.)
+      summary: Обновить карточку
       parameters:
         - name: cardId
           in: path
@@ -90,34 +115,6 @@ paths:
               schema:
                 type: object
                 properties: {}
-  /cards:
-    post:
-      operationId: createCard
-      summary: Создать новую карточку
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - name
-                - idList
-              properties:
-                name:
-                  type: string
-                desc:
-                  type: string
-                idList:
-                  type: string
-      responses:
-        '200':
-          description: Карточка создана
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
   /cards/{cardId}/idList:
     put:
       operationId: moveCardToList
@@ -134,8 +131,7 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - value
+              required: [value]
               properties:
                 value:
                   type: string
@@ -163,8 +159,7 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - value
+              required: [value]
               properties:
                 value:
                   type: string
@@ -214,8 +209,7 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - text
+              required: [text]
               properties:
                 text:
                   type: string
@@ -230,20 +224,19 @@ paths:
   /proxy/trello:
     post:
       operationId: proxyTrelloRequest
-      summary: Выполнить запрос к Trello API через прокси. Ключ и токен подставляются автоматически.
+      summary: Выполнить произвольный запрос к Trello API через прокси
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [method, endpoint]
               properties:
                 method:
                   type: string
-                  example: GET
                 endpoint:
                   type: string
-                  example: /members/me
                 params:
                   type: object
                 data:
