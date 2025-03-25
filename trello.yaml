@@ -1,230 +1,15 @@
 openapi: 3.1.0
 info:
-  title: Trello Proxy API
-  description: Прокси API для доступа к Trello. GPT может управлять досками, карточками, списками, участниками и комментариями.
+  title: Trello Proxy API (via single endpoint)
+  description: GPT управляет Trello через прокси `/proxy/trello`, автоматически подставляя ключ и токен.
   version: 1.0.0
 servers:
   - url: https://mindexecutor-production.up.railway.app
 paths:
-  /boards:
-    get:
-      operationId: getBoards
-      summary: Получить все доски пользователя
-      responses:
-        '200':
-          description: Список досок
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties: {}
-  /boards/{boardId}/lists:
-    get:
-      operationId: getListsOnBoard
-      summary: Получить списки на доске
-      parameters:
-        - name: boardId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Списки на доске
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties: {}
-  /lists/{listId}/cards:
-    get:
-      operationId: getCardsInList
-      summary: Получить карточки в списке
-      parameters:
-        - name: listId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Карточки в списке
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties: {}
-  /cards:
-    post:
-      operationId: createCard
-      summary: Создать карточку
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [name, idList]
-              properties:
-                name:
-                  type: string
-                desc:
-                  type: string
-                idList:
-                  type: string
-      responses:
-        '200':
-          description: Карточка создана
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-  /cards/{cardId}:
-    put:
-      operationId: updateCard
-      summary: Обновить карточку
-      parameters:
-        - name: cardId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                desc:
-                  type: string
-      responses:
-        '200':
-          description: Карточка обновлена
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-  /cards/{cardId}/idList:
-    put:
-      operationId: moveCardToList
-      summary: Переместить карточку в другой список
-      parameters:
-        - name: cardId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [value]
-              properties:
-                value:
-                  type: string
-      responses:
-        '200':
-          description: Карточка перемещена
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-  /cards/{cardId}/members:
-    post:
-      operationId: addMemberToCard
-      summary: Добавить участника к карточке
-      parameters:
-        - name: cardId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [value]
-              properties:
-                value:
-                  type: string
-      responses:
-        '200':
-          description: Участник добавлен
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-    delete:
-      operationId: removeMemberFromCard
-      summary: Удалить участника с карточки
-      parameters:
-        - name: cardId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: memberId
-          in: query
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Участник удалён
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-  /cards/{cardId}/actions/comments:
-    post:
-      operationId: commentOnCard
-      summary: Добавить комментарий к карточке
-      parameters:
-        - name: cardId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [text]
-              properties:
-                text:
-                  type: string
-      responses:
-        '200':
-          description: Комментарий добавлен
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
   /proxy/trello:
     post:
-      operationId: proxyTrelloRequest
-      summary: Выполнить произвольный запрос к Trello API через прокси
+      operationId: getBoards
+      summary: Получить все доски пользователя
       requestBody:
         required: true
         content:
@@ -235,15 +20,269 @@ paths:
               properties:
                 method:
                   type: string
+                  example: GET
                 endpoint:
                   type: string
+                  example: /members/me/boards
                 params:
                   type: object
                 data:
                   type: object
       responses:
         '200':
-          description: Ответ от Trello API
+          description: Список досок
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+
+    put:
+      operationId: updateCard
+      summary: Обновить карточку
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [method, endpoint, data]
+              properties:
+                method:
+                  type: string
+                  example: PUT
+                endpoint:
+                  type: string
+                  example: /cards/{cardId}
+                params:
+                  type: object
+                data:
+                  type: object
+      responses:
+        '200':
+          description: Карточка обновлена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+
+    patch:
+      operationId: commentOnCard
+      summary: Добавить комментарий к карточке
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [method, endpoint, data]
+              properties:
+                method:
+                  type: string
+                  example: POST
+                endpoint:
+                  type: string
+                  example: /cards/{cardId}/actions/comments
+                params:
+                  type: object
+                data:
+                  type: object
+                  example:
+                    text: "Комментарий от GPT"
+      responses:
+        '200':
+          description: Комментарий добавлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+
+    post:
+      operationId: createCard
+      summary: Создать карточку
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [method, endpoint, data]
+              properties:
+                method:
+                  type: string
+                  example: POST
+                endpoint:
+                  type: string
+                  example: /cards
+                params:
+                  type: object
+                data:
+                  type: object
+      responses:
+        '200':
+          description: Карточка создана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+
+    delete:
+      operationId: removeMemberFromCard
+      summary: Удалить участника с карточки
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [method, endpoint, params]
+              properties:
+                method:
+                  type: string
+                  example: DELETE
+                endpoint:
+                  type: string
+                  example: /cards/{cardId}/members
+                params:
+                  type: object
+                  example:
+                    memberId: "abc123"
+                data:
+                  type: object
+      responses:
+        '200':
+          description: Участник удалён
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+
+    put:
+      operationId: moveCardToList
+      summary: Переместить карточку в другой список
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [method, endpoint, data]
+              properties:
+                method:
+                  type: string
+                  example: PUT
+                endpoint:
+                  type: string
+                  example: /cards/{cardId}/idList
+                params:
+                  type: object
+                data:
+                  type: object
+                  example:
+                    value: "idList123"
+      responses:
+        '200':
+          description: Карточка перемещена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+
+    post:
+      operationId: addMemberToCard
+      summary: Добавить участника к карточке
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [method, endpoint, data]
+              properties:
+                method:
+                  type: string
+                  example: POST
+                endpoint:
+                  type: string
+                  example: /cards/{cardId}/members
+                params:
+                  type: object
+                data:
+                  type: object
+                  example:
+                    value: "idMember123"
+      responses:
+        '200':
+          description: Участник добавлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+
+    get:
+      operationId: getListsOnBoard
+      summary: Получить списки на доске
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [method, endpoint]
+              properties:
+                method:
+                  type: string
+                  example: GET
+                endpoint:
+                  type: string
+                  example: /boards/{boardId}/lists
+                params:
+                  type: object
+                  example:
+                    boardId: "xyz789"
+                data:
+                  type: object
+      responses:
+        '200':
+          description: Списки получены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+
+    put:
+      operationId: getCardsInList
+      summary: Получить карточки в списке
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [method, endpoint]
+              properties:
+                method:
+                  type: string
+                  example: GET
+                endpoint:
+                  type: string
+                  example: /lists/{listId}/cards
+                params:
+                  type: object
+                  example:
+                    listId: "abc321"
+                data:
+                  type: object
+      responses:
+        '200':
+          description: Карточки получены
           content:
             application/json:
               schema:
