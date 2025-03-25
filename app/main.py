@@ -4,7 +4,8 @@ import httpx
 
 # 🔐 Сюда подставлены рабочие ключи (для теста)
 TRELLO_KEY = "93fb566829e3c312385bd5d079f40eb8"
-TRELLO_TOKEN = "ATTA56e3be5dc3788a7ef2aa3d4ff96cef159217a07a5ed967952a59a392ab6129ea6F8B31DA"
+TRELLO_TOKEN = "ATTA6fb7359c08b30ec2d9c7f45ff6fde1fec731f251f2efe9be60416995c01df3b6B474C76A"
+
 
 app = FastAPI()
 
