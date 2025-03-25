@@ -1,5 +1,8 @@
 from fastapi import FastAPI
-from app.routers import proxy
+from fastapi.responses import FileResponse
 
 app = FastAPI()
-app.include_router(proxy.router)
+
+@app.get("/trello.yaml", response_class=FileResponse)
+async def get_openapi_yaml():
+    return FileResponse("trello.yaml", media_type="text/yaml")
