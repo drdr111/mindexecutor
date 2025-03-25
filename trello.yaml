@@ -1,12 +1,11 @@
 openapi: 3.1.0
 info:
   title: Trello Proxy API
-  description: Прокси API для полного доступа к Trello через Railway. GPT может управлять
-    досками, списками, карточками, участниками и комментариями.
+  description: Прокси API для полного доступа к Trello через Railway. GPT может управлять досками, списками, карточками, участниками и комментариями.
   version: 1.0.0
 servers:
-- url: https://mindexecutor-production.up.railway.app
-  description: Railway backend proxy
+  - url: https://mindexecutor-production.up.railway.app
+    description: Railway backend proxy
 paths:
   /boards:
     get:
@@ -21,16 +20,17 @@ paths:
                 type: array
                 items:
                   type: object
+                  properties: {}
   /boards/{boardId}/lists:
     get:
       operationId: getListsOnBoard
       summary: Получить списки на доске
       parameters:
-      - name: boardId
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: boardId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Списки на доске
@@ -40,16 +40,17 @@ paths:
                 type: array
                 items:
                   type: object
+                  properties: {}
   /lists/{listId}/cards:
     get:
       operationId: getCardsInList
       summary: Получить карточки в списке
       parameters:
-      - name: listId
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: listId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Карточки в списке
@@ -59,16 +60,17 @@ paths:
                 type: array
                 items:
                   type: object
+                  properties: {}
   /cards/{cardId}:
     put:
       operationId: updateCard
       summary: Обновить карточку (название, описание и др.)
       parameters:
-      - name: cardId
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: cardId
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -87,6 +89,7 @@ paths:
             application/json:
               schema:
                 type: object
+                properties: {}
   /cards:
     post:
       operationId: createCard
@@ -98,8 +101,8 @@ paths:
             schema:
               type: object
               required:
-              - name
-              - idList
+                - name
+                - idList
               properties:
                 name:
                   type: string
@@ -114,16 +117,17 @@ paths:
             application/json:
               schema:
                 type: object
+                properties: {}
   /cards/{cardId}/idList:
     put:
       operationId: moveCardToList
       summary: Переместить карточку в другой список
       parameters:
-      - name: cardId
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: cardId
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -131,7 +135,7 @@ paths:
             schema:
               type: object
               required:
-              - value
+                - value
               properties:
                 value:
                   type: string
@@ -142,16 +146,17 @@ paths:
             application/json:
               schema:
                 type: object
+                properties: {}
   /cards/{cardId}/members:
     post:
       operationId: addMemberToCard
       summary: Добавить участника к карточке
       parameters:
-      - name: cardId
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: cardId
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -159,7 +164,7 @@ paths:
             schema:
               type: object
               required:
-              - value
+                - value
               properties:
                 value:
                   type: string
@@ -170,20 +175,21 @@ paths:
             application/json:
               schema:
                 type: object
+                properties: {}
     delete:
       operationId: removeMemberFromCard
       summary: Удалить участника с карточки
       parameters:
-      - name: cardId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: memberId
-        in: query
-        required: true
-        schema:
-          type: string
+        - name: cardId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: memberId
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Участник удалён
@@ -191,16 +197,17 @@ paths:
             application/json:
               schema:
                 type: object
+                properties: {}
   /cards/{cardId}/actions/comments:
     post:
       operationId: commentOnCard
       summary: Добавить комментарий к карточке
       parameters:
-      - name: cardId
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: cardId
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -208,7 +215,7 @@ paths:
             schema:
               type: object
               required:
-              - text
+                - text
               properties:
                 text:
                   type: string
@@ -219,11 +226,11 @@ paths:
             application/json:
               schema:
                 type: object
+                properties: {}
   /proxy/trello:
     post:
-      operationId: callTrelloAPI
-      summary: Выполнить запрос к Trello API через прокси. Ключ и токен подставляются
-        автоматически.
+      operationId: proxyTrelloRequest
+      summary: Выполнить запрос к Trello API через прокси. Ключ и токен подставляются автоматически.
       requestBody:
         required: true
         content:
@@ -248,3 +255,4 @@ paths:
             application/json:
               schema:
                 type: object
+                properties: {}
