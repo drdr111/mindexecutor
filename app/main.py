@@ -1,47 +1,49 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, JSONResponse
-import os
+from fastapi.responses import FileResponse
 import httpx
+
+# 🔐 Сюда подставлены рабочие ключи (для теста)
+TRELLO_KEY = "93fb566829e3c312385bd5d079f40eb8"
+TRELLO_TOKEN = "ATTA56e3be5dc3788a7ef2aa3d4ff96cef159217a07a5ed967952a59a392ab6129ea6F8B31DA"
 
 app = FastAPI()
 
-@app.get("/")
-def root():
-    return {"status": "Trello Proxy is running"}
-
-@app.get("/trello.yaml")
-def serve_yaml():
-    return FileResponse("trello.yaml", media_type="text/yaml")
+@app.get("/trello.yaml", response_class=FileResponse)
+async def get_openapi_yaml():
+    return FileResponse("trello.yaml", media_type="application/yaml")
 
 @app.post("/proxy/trello")
 async def proxy_trello(request: Request):
     data = await request.json()
+
     method = data.get("method", "GET").upper()
     endpoint = data.get("endpoint")
     params = data.get("params", {}) or {}
     body = data.get("data", {}) or {}
 
     if not endpoint:
-        return JSONResponse(status_code=400, content={"error": "Missing endpoint"})
+        return {"error": "Missing endpoint"}
 
-    # Добавляем авторизацию
-    params["key"] = os.getenv("TRELLO_KEY")
-    params["token"] = os.getenv("TRELLO_TOKEN")
+    # Добавляем ключ и токен Trello
+    params["key"] = TRELLO_KEY
+    params["token"] = TRELLO_TOKEN
 
     url = f"https://api.trello.com/1{endpoint}"
 
-    try:
-        async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient() as client:
+        try:
             response = await client.request(method, url, params=params, json=body)
             response.raise_for_status()
             return response.json()
-    except httpx.HTTPStatusError as e:
-        return JSONResponse(
-            status_code=e.response.status_code,
-            content={
-                "error": f"Trello API error {e.response.status_code}",
+        except httpx.HTTPStatusError as e:
+            return {
+                "error": f"Trello error {e.response.status_code}",
                 "details": e.response.text
             }
-        )
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"error": "Unexpected error", "details": str(e)})
+        except Exception as e:
+            return {"error": "Unexpected error", "details": str(e)}
+
+# 👇 Обеспечиваем запуск сервера локально и на Railway
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)
