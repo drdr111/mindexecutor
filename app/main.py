@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 import httpx
 
 # 🔐 Сюда подставлены рабочие ключи (для теста)
@@ -22,7 +22,7 @@ async def proxy_trello(request: Request):
     body = data.get("data", {}) or {}
 
     if not endpoint:
-        return {"error": "Missing endpoint"}
+        return JSONResponse(content={"error": "Missing endpoint"}, status_code=400)
 
     # Добавляем ключ и токен Trello
     params["key"] = TRELLO_KEY
@@ -30,18 +30,24 @@ async def proxy_trello(request: Request):
 
     url = f"https://api.trello.com/1{endpoint}"
 
-    async with httpx.AsyncClient() as client:
-        try:
+    try:
+        async with httpx.AsyncClient() as client:
             response = await client.request(method, url, params=params, json=body)
             response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            return {
+            return JSONResponse(content=response.json())
+    except httpx.HTTPStatusError as e:
+        return JSONResponse(
+            status_code=e.response.status_code,
+            content={
                 "error": f"Trello error {e.response.status_code}",
                 "details": e.response.text
             }
-        except Exception as e:
-            return {"error": "Unexpected error", "details": str(e)}
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Unexpected error", "details": str(e)}
+        )
 
 # 👇 Обеспечиваем запуск сервера локально и на Railway
 if __name__ == "__main__":
