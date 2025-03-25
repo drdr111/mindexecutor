@@ -4,7 +4,7 @@ info:
   description: Прокси API для полного доступа к Trello через Railway. GPT может управлять досками, списками, карточками, участниками и комментариями.
   version: 1.0.0
 servers:
-  - url: https://mindexecutor-production.up.railway.app
+  - url: https://mindexecutor-production.up.railway.app/
     description: Railway backend proxy
 
 paths:
