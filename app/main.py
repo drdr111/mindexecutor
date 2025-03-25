@@ -16,6 +16,11 @@ async def get_openapi_yaml():
 @app.post("/proxy/trello")
 async def proxy_trello(request: Request):
     data = await request.json()
+    print("📦 Получен запрос от GPT:")
+    print("  🔹 method:", data.get("method"))
+    print("  🔹 endpoint:", data.get("endpoint"))
+    print("  🔹 params:", data.get("params"))
+    print("  🔹 data:", data.get("data"))
 
     method = data.get("method", "GET").upper()
     endpoint = data.get("endpoint")
@@ -30,7 +35,12 @@ async def proxy_trello(request: Request):
     params["token"] = TRELLO_TOKEN
 
     url = f"https://api.trello.com/1{endpoint}"
-
+  # 🔍 Печатаем финальный URL и параметры
+    print("➡️ Отправляем на Trello:")
+    print("  🔸 URL:", url)
+    print("  🔸 method:", method)
+    print("  🔸 params (в URL):", params)
+    print("  🔸 body (json):", body)
     try:
         async with httpx.AsyncClient() as client:
             response = await client.request(method, url, params=params, json=body)
